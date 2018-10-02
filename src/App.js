@@ -9,6 +9,8 @@ import { ToastContainer, toast } from 'react-toastify';
 class App extends Component {
   constructor(props) {
     super(props);
+    
+    this.baseUrl = "https://joes-autos.herokuapp.com/api";
 
     this.state = {
       vehiclesToDisplay: [],
@@ -26,39 +28,97 @@ class App extends Component {
     this.resetData = this.resetData.bind(this);
     this.byYear = this.byYear.bind(this);
     this.deleteBuyer = this.deleteBuyer.bind(this);
+    this.updatePrice = this.updatePrice.bind(this);
   }
 
   getVehicles() {
     // axios (GET)
+    const promise = axios.get(this.baseUrl + '/vehicles')
     // setState with response -> vehiclesToDisplay
+    promise.then(res => {
+      // toast.success("Success!");
+      this.setState({
+        vehiclesToDisplay : res.data
+      })
+    }).catch(res => {
+      toast.error("Failed!");
+    })
   }
 
   getPotentialBuyers() {
     // axios (GET)
+    const promise = axios.get(this.baseUrl + '/buyers');
+
     // setState with response -> buyersToDisplay
+    promise.then(res => {
+      // toast.success("Success!");
+      this.setState({
+        buyersToDisplay : res.data
+      })
+    }).catch(res => {
+      toast.error("Failed!");
+    })
   }
 
   sellCar(id) {
     // axios (DELETE)
+    const promise = axios.delete(this.baseUrl + `/vehicles/${id}`)
     // setState with response -> vehiclesToDisplay
+    promise.then(res => {
+      // toast.success("Success!");
+      this.setState({
+        vehiclesToDisplay : res.data.vehicles
+      })
+    }).catch(res => {
+      toast.error("Failed!");
+    })
   }
 
   filterByMake() {
     let make = this.selectedMake.value;
 
     // axios (GET)
+    const promise = axios.get(this.baseUrl + '/vehicles')
     // setState with response -> vehiclesToDisplay
+    promise.then(res => {
+      // toast.success("Success!");
+      this.setState({
+        vehiclesToDisplay : res.data.filter(car => car.make == make)
+      })
+    }).catch(res => {
+      toast.error("Failed!");
+    })
   }
 
   filterByColor() {
     let color = this.selectedColor.value;
 
     // axios (GET)
+    const promise = axios.get(this.baseUrl + '/vehicles')
     // setState with response -> vehiclesToDisplay
+    promise.then(res => {
+      // toast.success("Success!");
+      this.setState({
+        vehiclesToDisplay : res.data.filter(car => car.color == color)
+      })
+    }).catch(res => {
+      toast.error("Failed!");
+    })
   }
 
   updatePrice(priceChange, id) {
     // axios (PUT)
+    const promise = axios.put(this.baseUrl + `/vehicles/${id}/${priceChange}`);
+    promise.then(res => {
+      // toast.success("Success!");
+      console.log(res.data);
+      this.setState({
+        vehiclesToDisplay : res.data.vehicles
+      })
+    }).catch(res => {
+      console.log(res);
+      toast.error("Failed!");
+    })
     // setState with response -> vehiclesToDisplay
   }
 
@@ -72,6 +132,12 @@ class App extends Component {
     };
 
     // axios (POST)
+    axios.post(this.baseUrl+'/vehicles', newCar)
+    .then(res => {
+      this.setState({
+        vehiclesToDisplay : res.data.vehicles
+      })
+    })
     // setState with response -> vehiclesToDisplay
   }
 
@@ -83,26 +149,66 @@ class App extends Component {
     };
 
     //axios (POST)
+    const promise = axios.post(this.baseUrl + '/buyers', newBuyer)
     // setState with response -> buyersToDisplay
+    promise.then(res => {
+      // toast.success("Success!");
+      this.setState({
+        buyersToDisplay : res.data.buyers
+      })
+    }).catch(res => {
+      toast.error("Failed!");
+    })
   }
 
   deleteBuyer(id) {
-    // axios (DELETE)
-    //setState with response -> buyersToDisplay
+    //axios (DELETE)
+    const promise = axios.delete(this.baseUrl + `/buyers/${id}`)
+    // setState with response -> buyersToDisplay
+    promise.then(res => {
+      // toast.success("Success!");
+      this.setState({
+        buyersToDisplay : res.data.buyers
+      })
+    }).catch(res => {
+      toast.error("Failed!");
+    })
   }
 
   nameSearch() {
-    let searchLetters = this.searchLetters.value;
+    let searchLetters = this.searchLetters.value.toLowerCase();
 
     // axios (GET)
+    const promise = axios.get(this.baseUrl + '/buyers')
     // setState with response -> buyersToDisplay
+    
+    promise.then(res => {
+      // toast.success("Success!");
+      const filtered = res.data.filter(buyer => buyer.name.toLowerCase().includes(searchLetters))
+      this.setState({
+        buyersToDisplay : filtered
+      })
+    }).catch(res => {
+      toast.error("Failed!");
+    })
+    
   }
 
   byYear() {
     let year = this.searchYear.value;
 
     // axios (GET)
+    const promise = axios.get(this.baseUrl + '/vehicles')
     // setState with response -> vehiclesToDisplay
+    promise.then(res => {
+      // toast.success("Success!");
+      const filtered = res.data.filter(car => car.year===parseInt(year, 10))
+      this.setState({
+        vehiclesToDisplay : filtered
+      })
+    }).catch(res => {
+      toast.error("Failed!");
+    })
   }
 
   // Do not edit the code below
